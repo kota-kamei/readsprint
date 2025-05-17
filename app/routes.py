@@ -84,7 +84,7 @@ Style: {style_mapping[style]}
 Difficulty: {difficulty_mapping[difficulty]}
 
 3. Content Requirements:
-- Length: About 130 words
+- Length: About 130-150 words
 """
 
     if target_words:
@@ -92,7 +92,7 @@ Difficulty: {difficulty_mapping[difficulty]}
         
     user_prompt += """\n\n4. Respond in this format:
 [ENGLISH]
-(English text, only the plain text content with no markdown formatting, no asterisks, no hashtags, or any other markup symbols)
+(English text, only the plain text content with no markdown formatting, no asterisks, no hashtags, or any other markup symbols. Do not include any title.)
 
 [JAPANESE]
 (Japanese translation)
@@ -102,7 +102,7 @@ Difficulty: {difficulty_mapping[difficulty]}
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4.1-nano",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}

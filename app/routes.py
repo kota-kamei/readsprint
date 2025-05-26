@@ -84,7 +84,7 @@ Style: {style_mapping[style]}
 Difficulty: {difficulty_mapping[difficulty]}
 
 3. Content Requirements:
-- Length: About 130-150 words
+- Length: About 130 words
 """
 
     if target_words:

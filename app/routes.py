@@ -107,8 +107,8 @@ Difficulty: {difficulty_mapping[difficulty]}
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=1.0,
-            max_tokens=800,
+            temperature=1.2,
+            max_tokens=1024,
         )
         return response.choices[0].message.content
     except Exception as e:

@@ -21,7 +21,6 @@ TEXT_STYLES = [
     "ニュース記事",
     "エッセイ",
     "物語文",
-    "ユーザーマニュアル",
     "日常会話"
 ]
 
@@ -67,8 +66,7 @@ def generate_text(difficulty, style, target_words=None):
         "ニュース記事": """News Article""",
         "エッセイ": """Essay""",
         "物語文": """Story""",
-        "ユーザーマニュアル": """User Manual""",
-        "日常会話": """Daily Conversation"""
+        "日常会話": """Daily Conversation between two people"""
     }
     
     user_prompt = f"""Create an English text strictly following these guidelines:
@@ -111,6 +109,26 @@ Difficulty: {difficulty_mapping[difficulty]}
             max_tokens=1024,
         )
         return response.choices[0].message.content
+    # try:
+    #     response = client.responses.create(
+    #         model="gpt-5-nano",
+    #         input=[
+    #             {"role": "system", "content": system_prompt},
+    #             {"role": "user", "content": user_prompt}
+    #         ],
+    #         text={
+    #             "format": {
+    #                 "type": "text"
+    #             },
+    #             "verbosity": "medium"
+    #         },
+    #         reasoning={
+    #             "effort": "minimal",
+    #             "summary": "auto"
+    #         },
+    #         store=False
+    #     )
+    #     return response.output_text
     except Exception as e:
         current_app.logger.error(f"OpenAI API error: {str(e)}")
         raise

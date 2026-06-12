@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReadSprint</title>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #2C3E50;
+            --footer-bg: #4A90E2;
+            --footer-text: #E5E7EB;
+            --background-color: #F5F7FA;
+            --text-color: #333333;
+            --error-color: #E74C3C;
+            --success-color: #2ECC71;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .maintenance-container {
+            max-width: 600px;
+            width: 90%;
+            background: white;
+            padding: clamp(20px, 5vw, 40px);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .maintenance-icon {
+            width: clamp(80px, 15vw, 120px);
+            height: clamp(80px, 15vw, 120px);
+            margin: 20px auto;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        p {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .status-badge {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            margin-bottom: 30px;
+        }
+
+        .estimated-time {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            width: clamp(30px, 8vw, 40px);
+            height: clamp(30px, 8vw, 40px);
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .loading-spinner {
+                animation: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .maintenance-container {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .maintenance-container {
+                padding: 50px;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+
+            .maintenance-container {
+                background: #2d2d2d;
+            }
+
+            .status-badge {
+                background-color: var(--primary-color);
+            }
+
+            .loading-spinner {
+                border-color: #404040;
+                border-top-color: var(--primary-color);
+            }
+
+            p {
+                color: #e0e0e0;
+            }
+
+            .estimated-time {
+                color: #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-container">
+        <div class="logo">ReadSprint</div>
+        <svg class="maintenance-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <div class="status-badge">システムメンテナンス中</div>
+        <h1>メンテナンスのためサービス提供を一時停止しております</h1>
+        <p>ご不便をおかけして申し訳ございませんが、作業完了までしばらくお待ちください。</p>
+        <div class="loading-spinner"></div>
+        <p class="estimated-time">予定復旧時間：<span id="maintenance-end">未定</span></p>
+    </div>
+</body>
+</html>

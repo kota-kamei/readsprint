@@ -211,6 +211,105 @@ input {
   font-style: italic;
 }
 
+/* Customize page */
+.customize-section {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.customize-section h1 {
+  text-align: center;
+  color: var(--secondary-color);
+  margin-bottom: 2rem;
+}
+
+fieldset.form-field {
+  border: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+}
+
+fieldset.form-field legend {
+  font-weight: 500;
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* Option cards (radio choices) */
+.option-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.option-grid-levels {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.option-grid-styles {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.option-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.9rem 1rem;
+  background-color: white;
+  border: 2px solid #e5e7eb;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.option-card:hover {
+  border-color: var(--primary-color);
+}
+
+.option-card input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.option-card:has(input:checked) {
+  border-color: var(--primary-color);
+  background-color: rgba(74, 144, 226, 0.08);
+  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.2);
+}
+
+.option-card:focus-within {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.option-title {
+  font-weight: 600;
+  color: var(--secondary-color);
+}
+
+.option-meta {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.option-desc {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .option-grid-levels {
+    grid-template-columns: 1fr;
+  }
+
+  .option-grid-styles {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Alerts */
 .alert {
   padding: 1rem;
@@ -238,7 +337,8 @@ input {
   margin-bottom: 3rem;
 }
 
-.hero h1 {
+.hero h1,
+.hero h2 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
@@ -272,6 +372,17 @@ input {
   padding: 2rem;
   border-radius: var(--border-radius);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.feature-card h3 {
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
 }
 
 /* Reading Page */
@@ -451,4 +562,45 @@ input {
     width: 100%;
     text-align: center;
   }
+}
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 2000;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(74, 144, 226, 0.2);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-message {
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hero CTA buttons */
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }

@@ -5,47 +5,53 @@
 {% block content %}
 <section class="customize-section">
     <h1>英文カスタマイズ</h1>
-    
-    <form action="{{ url_for('main.generate') }}" method="POST" class="customize-form">
-        <div class="form-group">
-            <div class="form-field">
-                <label for="difficulty">難易度</label>
-                <select id="difficulty" name="difficulty" required>
-                    {% for level, name in difficulties.items() %}
-                        <option value="{{ level }}">{{ name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
 
-            <div class="form-field">
-                <label for="style">文章スタイル</label>
-                <select id="style" name="style" required>
-                    {% for style in styles %}
-                        <option value="{{ style }}">{{ style }}</option>
-                    {% endfor %}
-                </select>
+    <form action="{{ url_for('main.generate') }}" method="POST" class="customize-form js-loading-form">
+        <fieldset class="form-field">
+            <legend>レベル</legend>
+            <div class="option-grid option-grid-levels">
+                {% for key, info in levels.items() %}
+                <label class="option-card">
+                    <input type="radio" name="level" value="{{ key }}"{% if key == selected_level %} checked{% endif %} required>
+                    <span class="option-title">{{ info.label }}</span>
+                    <span class="option-meta">{{ info.cefr }}</span>
+                    <span class="option-desc">{{ info.description }}</span>
+                </label>
+                {% endfor %}
             </div>
-        </div>
+        </fieldset>
 
-        <div class="form-group">
-            <div class="form-field">
-                <label>含める単語（最大5つまで）</label>
-                <div id="target-words-container">
-                    <div class="word-input-group">
-                        <input type="text" 
-                               name="target_words[]" 
-                               class="word-input"
-                               maxlength="30"
-                               pattern="[A-Za-z\s]+"
-                               placeholder="単語を入力">
-                    </div>
+        <fieldset class="form-field">
+            <legend>文章スタイル</legend>
+            <div class="option-grid option-grid-styles">
+                {% for name, info in styles.items() %}
+                <label class="option-card">
+                    <input type="radio" name="style" value="{{ name }}"{% if name == selected_style or (not selected_style and loop.first) %} checked{% endif %} required>
+                    <span class="option-title">{{ name }}</span>
+                    <span class="option-desc">{{ info.description }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </fieldset>
+
+        <fieldset class="form-field">
+            <legend>含める単語(最大3つまで)</legend>
+            <div id="target-words-container">
+                <div class="word-input-group">
+                    <input type="text"
+                           name="target_words[]"
+                           class="word-input"
+                           maxlength="30"
+                           pattern="[A-Za-z\s]+"
+                           placeholder="単語を入力">
                 </div>
-                <button type="button" id="add-word-btn" class="btn btn-outline btn-sm">
-                    単語を追加
-                </button>
-                <small class="form-help">※ オプション: 指定の単語を含む英文を生成します（各単語は30文字まで）</small>
             </div>
-        </div>
+            <button type="button" id="add-word-btn" class="btn btn-outline btn-sm">
+                単語を追加
+            </button>
+            <small class="form-help">※ オプション: 指定の単語を含む英文を生成します(各単語は30文字まで)</small>
+        </fieldset>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary" id="generate-btn">
                 読解開始

@@ -4,6 +4,14 @@
 
 {% block content %}
 <section class="reading-section">
+    <p class="reading-meta">
+        {%- if level_label -%}
+        {{ level_label }} × {{ style }} <span class="reading-meta-sub">({{ difficulty_label }})</span>
+        {%- else -%}
+        {{ difficulty_label }} × {{ style }}
+        {%- endif -%}
+    </p>
+
     <div class="timer-section">
         <div class="timer-display">
             <span id="minutes">00</span>:<span id="seconds">00</span>
@@ -13,27 +21,73 @@
             <button id="stopTimer" class="btn btn-secondary" disabled>停止</button>
             <button id="resetTimer" class="btn btn-outline">リセット</button>
         </div>
+        <div id="wpmResult" class="wpm-result" hidden>
+            読速: <strong><span id="wpmValue">0</span> WPM</strong>
+        </div>
     </div>
 
     <div class="reading-container">
         <div class="text-section">
-            <h2>英文</h2>
+            <h2>英文 <span class="word-count">({{ word_count }} words)</span></h2>
             <div class="english-text">
-                {{ english_text|safe }}
+                {% for paragraph in english_paragraphs %}
+                <p>{{ paragraph }}</p>
+                {% endfor %}
             </div>
         </div>
+
+        {% if quiz %}
+        <div class="text-section">
+            <h2>理解度クイズ</h2>
+            <p class="section-help">本文の内容と合っていれば「○ 正しい」、違っていれば「× 誤り」を選んでください。</p>
+            {% for item in quiz %}
+            <div class="quiz-item" data-answer="{{ 'true' if item.answer else 'false' }}"
+                 data-explanation="{{ item.explanation or '' }}">
+                <p class="quiz-statement">{{ item.statement }}</p>
+                <div class="quiz-buttons">
+                    <button type="button" class="btn btn-outline quiz-choice" data-choice="true">○ 正しい</button>
+                    <button type="button" class="btn btn-outline quiz-choice" data-choice="false">× 誤り</button>
+                </div>
+                <p class="quiz-feedback" hidden></p>
+                <p class="quiz-explanation" hidden></p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
         <div class="text-section">
             <h2>日本語訳</h2>
-            <div class="japanese-text">
-                {{ japanese_text|safe }}
+            <button type="button" id="toggleTranslation" class="btn btn-outline toggle-btn">
+                日本語訳を表示
+            </button>
+            <div id="japaneseText" class="japanese-text" hidden>
+                {% for paragraph in japanese_paragraphs %}
+                <p>{{ paragraph }}</p>
+                {% endfor %}
             </div>
         </div>
+
+        {% if vocab %}
+        <div class="text-section">
+            <h2>重要語彙</h2>
+            <button type="button" id="toggleVocab" class="btn btn-outline toggle-btn">
+                重要語彙を表示
+            </button>
+            <ul id="vocabList" class="vocab-list" hidden>
+                {% for item in vocab %}
+                <li><strong>{{ item.word }}</strong> — {{ item.meaning }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     </div>
 
     <div class="action-buttons">
-        <a href="{{ url_for('main.customize') }}" class="btn btn-primary">
-            新しい文章を読む
+        <form action="{{ url_for('main.regenerate') }}" method="POST" class="js-loading-form">
+            <button type="submit" class="btn btn-primary">同じ設定でもう一度</button>
+        </form>
+        <a href="{{ url_for('main.customize') }}" class="btn btn-outline">
+            設定を変えて読む
         </a>
         <a href="{{ url_for('main.index') }}" class="btn btn-outline">
             トップページに戻る
@@ -47,12 +101,15 @@
     let timerInterval;
     let seconds = 0;
     let isRunning = false;
+    const wordCount = {{ word_count }};
 
     const minutesDisplay = document.getElementById('minutes');
     const secondsDisplay = document.getElementById('seconds');
     const startButton = document.getElementById('startTimer');
     const stopButton = document.getElementById('stopTimer');
     const resetButton = document.getElementById('resetTimer');
+    const wpmResult = document.getElementById('wpmResult');
+    const wpmValue = document.getElementById('wpmValue');
 
     function updateDisplay() {
         const mins = Math.floor(seconds / 60);
@@ -66,6 +123,7 @@
             isRunning = true;
             startButton.disabled = true;
             stopButton.disabled = false;
+            wpmResult.hidden = true;
             timerInterval = setInterval(() => {
                 seconds++;
                 updateDisplay();
@@ -79,6 +137,10 @@
             startButton.disabled = false;
             stopButton.disabled = true;
             clearInterval(timerInterval);
+            if (seconds > 0) {
+                wpmValue.textContent = Math.round(wordCount / (seconds / 60));
+                wpmResult.hidden = false;
+            }
         }
     }
 
@@ -86,14 +148,67 @@
         stopTimer();
         seconds = 0;
         updateDisplay();
+        wpmResult.hidden = true;
     }
 
     startButton.addEventListener('click', startTimer);
     stopButton.addEventListener('click', stopTimer);
     resetButton.addEventListener('click', resetTimer);
+
+    function setupToggle(buttonId, targetId, label) {
+        const button = document.getElementById(buttonId);
+        const target = document.getElementById(targetId);
+        if (!button || !target) return;
+        button.addEventListener('click', () => {
+            const isHidden = target.hidden;
+            target.hidden = !isHidden;
+            button.textContent = (isHidden ? label + 'を隠す' : label + 'を表示');
+        });
+    }
+
+    setupToggle('toggleTranslation', 'japaneseText', '日本語訳');
+    setupToggle('toggleVocab', 'vocabList', '重要語彙');
+
+    document.querySelectorAll('.quiz-item').forEach(item => {
+        const answer = item.dataset.answer;
+        const explanation = item.dataset.explanation;
+        const feedback = item.querySelector('.quiz-feedback');
+        const explanationEl = item.querySelector('.quiz-explanation');
+        item.querySelectorAll('.quiz-choice').forEach(button => {
+            button.addEventListener('click', () => {
+                const correct = button.dataset.choice === answer;
+                feedback.textContent = correct
+                    ? '正解!'
+                    : `不正解… 正解は「${answer === 'true' ? '○ 正しい' : '× 誤り'}」です。`;
+                feedback.className = 'quiz-feedback ' + (correct ? 'quiz-correct' : 'quiz-incorrect');
+                feedback.hidden = false;
+                // 問題文が本文と一致しない(FALSE)場合は、どこが違うのかを示す
+                if (answer === 'false' && explanation) {
+                    explanationEl.textContent = explanation;
+                    explanationEl.hidden = false;
+                }
+                item.querySelectorAll('.quiz-choice').forEach(b => {
+                    b.disabled = true;
+                    if (b.dataset.choice === answer) b.classList.add('quiz-answer-highlight');
+                });
+            });
+        });
+    });
 </script>
 
 <style>
+    .reading-meta {
+        text-align: center;
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .reading-meta-sub {
+        font-size: 0.85em;
+        color: #999;
+    }
+
     .timer-section {
         text-align: center;
         margin: 20px 0;
@@ -124,6 +239,102 @@
     .timer-controls button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+    }
+
+    .wpm-result {
+        font-size: 1.2rem;
+        color: #333;
+        margin-top: 5px;
+    }
+
+    .word-count {
+        font-size: 0.9rem;
+        font-weight: normal;
+        color: #666;
+    }
+
+    .english-text p,
+    .japanese-text p {
+        margin-bottom: 1em;
+    }
+
+    .toggle-btn {
+        margin-bottom: 1rem;
+    }
+
+    .section-help {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .quiz-item {
+        margin-bottom: 1.25rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .quiz-statement {
+        margin-bottom: 0.75rem;
+    }
+
+    .quiz-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .quiz-buttons .btn {
+        width: auto;
+    }
+
+    .quiz-choice:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .quiz-choice.quiz-answer-highlight {
+        opacity: 1;
+        border-color: var(--success-color);
+        color: var(--success-color);
+    }
+
+    .quiz-feedback {
+        margin-top: 0.75rem;
+        font-weight: bold;
+    }
+
+    .quiz-explanation {
+        margin-top: 0.5rem;
+        padding: 0.75rem;
+        background-color: #fff;
+        border-left: 3px solid var(--primary-color);
+        border-radius: 4px;
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+    .quiz-correct {
+        color: var(--success-color);
+    }
+
+    .quiz-incorrect {
+        color: var(--error-color);
+    }
+
+    .vocab-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .vocab-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .action-buttons form {
+        display: contents;
     }
 </style>
 {% endblock %}

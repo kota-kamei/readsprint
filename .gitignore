@@ -37,3 +37,10 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+# Local venv / test cache
+.venv*/
+.pytest_cache/
+
+.claude
+CLAUDE.md
+.cursor

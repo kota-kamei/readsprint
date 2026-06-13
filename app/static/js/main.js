@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add new word input
         addWordBtn.addEventListener('click', function() {
             const wordInputs = wordContainer.querySelectorAll('.word-input-group');
-            if (wordInputs.length >= 5) {
+            if (wordInputs.length >= 3) {
                 return;
             }
             
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update add button state
         function updateAddButtonState() {
             const wordInputs = wordContainer.querySelectorAll('.word-input-group');
-            addWordBtn.disabled = wordInputs.length >= 5;
+            addWordBtn.disabled = wordInputs.length >= 3;
         }
         
         // Input validation
@@ -59,19 +59,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Form submission handling with loading state
-    const customizeForm = document.querySelector('.customize-form');
-    if (customizeForm) {
-        const generateButton = document.getElementById('generate-btn');
-        if (generateButton) {
-            customizeForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                generateButton.disabled = true;
-                generateButton.innerHTML = '<span class="loading-text">文章を生成しています...</span>';
-                this.submit();
-            });
-        }
-    }
+    // Show a loading overlay while the text is being generated
+    document.querySelectorAll('form.js-loading-form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p class="loading-message">文章を生成しています...</p>
+            `;
+            document.body.appendChild(overlay);
+        });
+    });
 });
 
 // Alert dismissal
